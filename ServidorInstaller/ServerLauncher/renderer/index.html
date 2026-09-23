@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Stock Papel Server</title>
+
+  <link
+    rel="stylesheet"
+    href="styles.css"
+  >
+
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- ================================= -->
+    <!-- ENCABEZADO -->
+    <!-- ================================= -->
+
+    <header class="header">
+
+      <div class="brand">
+
+        <div class="brand-icon">
+          <img 
+            id="iconoStockPapel"
+            src="assets/icon.svg"
+          >
+        </div>
+
+        <div>
+
+          <div class="brand-title">
+            Stock Papel
+          </div>
+
+          <div class="brand-subtitle">
+            Server
+          </div>
+
+        </div>
+
+      </div>
+
+      <div
+        id="indicador-header"
+        class="status-dot"
+      ></div>
+
+    </header>
+
+
+    <!-- ================================= -->
+    <!-- PESTAÑAS -->
+    <!-- ================================= -->
+
+    <nav class="tabs">
+
+      <button
+        class="tab active"
+        data-tab="servidor"
+      >
+        Servidor
+      </button>
+
+      <button
+        class="tab"
+        data-tab="base"
+      >
+        Base de datos
+      </button>
+
+      <button
+        class="tab"
+        data-tab="sistema"
+      >
+        Sistema
+      </button>
+
+      <button
+        class="tab"
+        data-tab="log"
+      >
+        Log
+      </button>
+
+    </nav>
+
+
+    <!-- ================================= -->
+    <!-- CONTENIDO -->
+    <!-- ================================= -->
+
+    <main class="content">
+
+
+      <!-- ================================= -->
+      <!-- SERVIDOR -->
+      <!-- ================================= -->
+
+      <section
+        id="tab-servidor"
+        class="tab-content active"
+      >
+
+        <div class="server-panel">
+
+          <div
+            id="estado-icono"
+            class="server-icon active"
+          >
+            ●
+          </div>
+
+          <h1 id="estado-titulo">
+            Iniciando servidor...
+          </h1>
+
+          <p id="estado-mensaje">
+            Esperando a que Stock Papel Server esté disponible.
+          </p>
+
+          <button
+            id="btn-servidor"
+            class="main-button"
+            disabled
+          >
+            DETENER SERVIDOR
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- ================================= -->
+      <!-- BASE DE DATOS -->
+      <!-- ================================= -->
+
+      <section
+        id="tab-base"
+        class="tab-content"
+      >
+
+        <div class="option-panel">
+
+          <h2>
+            Base de datos
+          </h2>
+
+          <p>
+            Administración de la base de datos de Stock Papel.
+          </p>
+
+          <div class="options">
+
+            <button id="btn-abrir-datos" class="option-button">
+
+              <span class="option-icon">
+                📁
+              </span>
+
+              <span>
+                Abrir carpeta de datos
+              </span>
+
+            </button>
+
+            <button id="btn-crear-backup" class="option-button">
+
+              <span class="option-icon">
+                💾
+              </span>
+
+              <span>
+                Crear backup
+              </span>
+
+            </button>
+
+            <button id="btn-importar-base" class="option-button">
+
+              <span class="option-icon">
+                📥
+              </span>
+
+              <span>
+                Importar base de datos
+              </span>
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ================================= -->
+      <!-- SISTEMA -->
+      <!-- ================================= -->
+
+      <section
+        id="tab-sistema"
+        class="tab-content"
+      >
+
+        <div class="option-panel">
+
+          <h2>
+            Sistema
+          </h2>
+
+          <p>
+            Configuración y mantenimiento de Stock Papel Server.
+          </p>
+
+          <div class="options">
+
+            <button id="btn-inicio-windows" class="option-button">
+
+              <span class="option-icon">
+                🪟
+              </span>
+
+              <span>
+                Iniciar junto con Windows
+              </span>
+
+              <span
+                id="inicio-windows"
+                class="toggle"
+              >
+                OFF
+              </span>
+
+            </button>
+
+            <button id="btn-vcredist" class="option-button">
+
+              <span class="option-icon">
+                🧩
+              </span>
+
+              <span>
+                Instalar Microsoft Visual C++
+              </span>
+
+            </button>
+
+            <button id="btn-desinstalar" class="option-button danger">
+
+              <span class="option-icon">
+                🗑
+              </span>
+
+              <span>
+                Desinstalar Stock Papel Server
+              </span>
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ================================= -->
+      <!-- LOG -->
+      <!-- ================================= -->
+
+      <section
+        id="tab-log"
+        class="tab-content"
+      >
+
+        <div class="log-panel">
+
+          <div class="log-header">
+
+            <span>
+              Registro del servidor
+            </span>
+
+            <button id="btn-limpiar-log">
+              Limpiar
+            </button>
+
+          </div>
+
+          <pre id="log"></pre>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <script src="app.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,475 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f5f6f8;
+  color: #252525;
+  overflow: hidden;
+}
+
+button {
+  font-family: inherit;
+}
+
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ========================================
+   HEADER
+======================================== */
+
+.header {
+  height: 76px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-icon img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.brand-subtitle {
+  font-size: 12px;
+  color: #777;
+  margin-top: 2px;
+}
+
+/* ========================================
+   INDICADOR DE ESTADO DEL SERVIDOR
+======================================== */
+
+.status-dot {
+  width: 11px;
+  height: 11px;
+
+  border-radius: 50%;
+
+  background: #999;
+
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* ========================================
+   SERVIDOR ACTIVO
+======================================== */
+
+.status-dot.active {
+
+  background: #20a04b;
+
+  box-shadow:
+    0 0 0 4px rgba(34, 197, 94, 0.12);
+
+}
+
+
+/* ========================================
+   SERVIDOR DETENIDO
+======================================== */
+
+.status-dot.stopped {
+
+  background: #4d4d4d;
+
+  box-shadow: none;
+
+}
+
+
+/* ========================================
+   SERVIDOR INICIANDO
+======================================== */
+
+.status-dot.starting {
+
+  background: #999;
+
+  box-shadow: none;
+
+}
+
+
+/* ========================================
+   ERROR
+======================================== */
+
+.status-dot.error {
+
+  background: #e20a19;
+
+  box-shadow: none;
+
+}
+
+
+/* ========================================
+   TABS
+======================================== */
+
+.tabs {
+  height: 48px;
+
+  display: flex;
+  align-items: stretch;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #e5e5e5;
+
+  padding-left: 18px;
+}
+
+.tab {
+  border: none;
+  background: transparent;
+
+  padding: 0 18px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #777;
+
+  cursor: pointer;
+
+  border-bottom: 3px solid transparent;
+}
+
+.tab:hover {
+  color: #222;
+}
+
+.tab.active {
+  color: #e20a19;
+  border-bottom-color: #e20a19;
+}
+
+
+/* ========================================
+   CONTENIDO
+======================================== */
+
+.content {
+  flex: 1;
+  position: relative;
+}
+
+.tab-content {
+  display: none;
+
+  height: 100%;
+
+  padding: 20px;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+
+/* ========================================
+   SERVIDOR
+======================================== */
+
+.server-panel {
+  height: 100%;
+
+  background: #ffffff;
+
+  border-radius: 12px;
+
+  border: 1px solid #e5e5e5;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.server-icon {
+  width: 48px;
+  height: 48px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 30px;
+
+  margin-bottom: 10px;
+
+  background: #eaf8ee;
+  color: #20a04b;
+}
+
+.server-icon.stopped {
+  background: #eeeeee;
+  color: #888;
+}
+
+.server-panel h1 {
+  font-size: 20px;
+  margin: 4px 0 8px;
+}
+
+.server-panel p {
+  color: #777;
+  font-size: 13px;
+
+  margin: 0 0 24px;
+}
+
+
+/* ========================================
+   BOTÓN PRINCIPAL
+======================================== */
+
+.main-button {
+  min-width: 220px;
+
+  padding: 12px 22px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #e20a19;
+  color: white;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform .15s,
+    opacity .15s;
+}
+
+.main-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  opacity: .92;
+}
+
+.main-button:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.main-button.start {
+  background: #168a3d;
+}
+
+
+/* ========================================
+   PANELES DE OPCIONES
+======================================== */
+
+.option-panel {
+  height: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e5e5;
+
+  border-radius: 12px;
+
+  padding: 24px;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.option-panel h2 {
+  margin: 0 0 6px;
+
+  font-size: 18px;
+}
+
+.option-panel p {
+  margin: 0 0 20px;
+
+  color: #777;
+
+  font-size: 13px;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option-button {
+  width: 100%;
+
+  height: 48px;
+
+  border: 1px solid #e2e2e2;
+
+  background: #fafafa;
+
+  border-radius: 8px;
+
+  padding: 0 14px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  font-size: 13px;
+
+  color: #333;
+}
+
+.option-button:hover {
+  background: #f1f1f1;
+}
+
+.option-icon {
+  width: 24px;
+  text-align: center;
+}
+
+.option-button.danger {
+  color: #d20b19;
+}
+
+.toggle {
+  margin-left: auto;
+
+  font-size: 11px;
+  font-weight: bold;
+
+  color: #999;
+}
+
+.toggle.on {
+  background: #e20a19;
+  color: white;
+}
+
+
+/* ========================================
+   LOG
+======================================== */
+
+.log-panel {
+  height: 395px;
+
+  background: #171717;
+
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.log-header {
+  height: 40px;
+
+  flex-shrink: 0;
+
+  background: #242424;
+
+  color: #ddd;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 12px;
+
+  font-size: 12px;
+}
+
+.log-header button {
+  border: none;
+
+  background: #444;
+
+  color: #ddd;
+
+  padding: 5px 10px;
+
+  border-radius: 5px;
+
+  cursor: pointer;
+
+  font-size: 11px;
+}
+
+.log-header button:hover {
+  background: #555;
+}
+
+#log {
+  flex: 1;
+
+  margin: 0;
+
+  padding: 12px;
+
+  overflow-y: auto;
+
+  color: #d8d8d8;
+
+  font-family: Consolas, "Courier New", monospace;
+
+  font-size: 11px;
+
+  line-height: 1.45;
+
+  white-space: pre-wrap;
+}

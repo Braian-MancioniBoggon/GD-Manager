@@ -1,0 +1,202 @@
+# ========================================
+
+# STOCK PAPEL - GITIGNORE
+
+# ========================================
+
+# ========================================
+
+# DEPENDENCIAS
+
+# ========================================
+
+node_modules/
+**/node_modules/
+
+# ========================================
+
+# VARIABLES DE ENTORNO
+
+# ========================================
+
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+.env.*
+!.env.example
+
+# ========================================
+
+# BUILDS Y DISTRIBUCIONES
+
+# ========================================
+
+dist/
+build/
+out/
+release/
+
+**/dist/
+**/build/
+**/out/
+**/release/
+
+# Electron Builder
+
+**/electron-builder/
+**/win-unpacked/
+
+# Instaladores generados
+
+*.exe
+*.msi
+*.dmg
+*.app
+*.deb
+*.rpm
+
+# ========================================
+
+# LOGS
+
+# ========================================
+
+*.log
+
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+logs/
+**/logs/
+
+# ========================================
+
+# MONGODB / DATOS LOCALES
+
+# ========================================
+
+data/
+data6/
+
+**/data/
+**/data6/
+
+mongodb/
+mongodb-data/
+**/mongodb/
+**/mongodb-data/
+
+mongod.lock
+
+# ========================================
+
+# BACKUPS
+
+# ========================================
+
+backup/
+backups/
+
+**/backup/
+**/backups/
+
+*.bak
+*.backup
+
+# ========================================
+
+# ARCHIVOS TEMPORALES
+
+# ========================================
+
+tmp/
+temp/
+
+**/tmp/
+**/temp/
+
+*.tmp
+*.temp
+
+# ========================================
+
+# SISTEMA OPERATIVO
+
+# ========================================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================================
+
+# EDITORES / IDE
+
+# ========================================
+
+.vscode/
+.idea/
+
+*.swp
+*.swo
+
+# ========================================
+
+# CACHE
+
+# ========================================
+
+.cache/
+.parcel-cache/
+.eslintcache/
+
+# ========================================
+
+# ARCHIVOS DE TEST / COBERTURA
+
+# ========================================
+
+coverage/
+.nyc_output/
+
+# ========================================
+
+# ARCHIVOS DE DESARROLLO LOCALES
+
+# ========================================
+
+servidor.json
+
+# Configuraciones locales que puedan contener
+
+# IPs, rutas o datos específicos de una PC
+
+*.local.json
+
+# ========================================
+
+# ARCHIVOS GENERADOS POR ELECTRON
+
+# ========================================
+
+**/generated/
+**/generated-assets/
+
+# Archivos de actualización
+
+*.blockmap
+latest.yml
+
+# ========================================
+
+# ARCHIVOS DE RESPALDO DE EDITORES
+
+# ========================================
+
+*~
+*.orig
+*.bak

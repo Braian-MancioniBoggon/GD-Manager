@@ -1,0 +1,41 @@
+{
+  "name": "stock-papel-cliente",
+  "version": "1.0.0",
+  "description": "Cliente de escritorio del sistema Stock Papel",
+  "main": "electron/main.js",
+  "author": "Braian Alan Mancioni Boggon",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^43.4.1",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.stockpapel.cliente",
+    "productName": "Stock Papel Cliente",
+
+    "directories": {
+      "output": "dist"
+    },
+
+    "files": [
+      "electron/**/*",
+      "assets/**/*"
+    ],
+
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Stock Papel"
+    }
+  }
+}

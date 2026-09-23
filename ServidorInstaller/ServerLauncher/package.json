@@ -1,0 +1,86 @@
+{
+  "name": "stock-papel-server",
+  "version": "1.0.0",
+  "description": "Servidor del sistema Stock Papel",
+  "main": "main.js",
+  "author": "Braian Alan Mancioni Boggon",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "38.8.6",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.stockpapel.server",
+    "productName": "Stock Papel Server",
+
+    "directories": {
+      "output": "dist"
+    },
+
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "package.json"
+    ],
+
+    "extraResources": [
+      {
+        "from": "icon.ico",
+        "to": "icon.ico"
+      },
+      {
+        "from": "icoff.ico",
+        "to": "icoff.ico"
+      },
+      {
+        "from": "../Node",
+        "to": "Node"
+      },
+      {
+        "from": "../Mongodb",
+        "to": "Mongodb"
+      },
+      {
+        "from": "../Backend",
+        "to": "Backend"
+      },
+      {
+        "from": "../Backend/node_modules",
+        "to": "Backend/node_modules"
+      },
+      {
+        "from": "../Config",
+        "to": "Config"
+      },
+      {
+        "from": "../Frontend",
+        "to": "Frontend"
+      },
+      {
+        "from": "../Tools",
+        "to": "Tools"
+      }
+    ],
+
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+
+  "allowScripts": {
+    "electron@38.8.6": true,
+    "electron-winstaller@5.4.0": true
+  }
+}
