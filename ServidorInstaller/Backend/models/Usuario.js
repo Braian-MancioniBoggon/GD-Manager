@@ -1,19 +1,37 @@
 const mongoose = require("mongoose");
 
 const permisosDisponibles = [
-"ver_stock",
-"ingresar_papel",
-"retirar_papel",
-"ajustar_stock",
-"crear_producto",
-"editar_producto",
-"desactivar_producto",
-"ver_historial",
-"administrar_usuarios",
-"crear_usuarios",
-"editar_usuarios",
-"desactivar_usuarios",
-"administrar_roles",
+  "ver_stock",
+  "ingresar_papel",
+  "retirar_papel",
+  "ajustar_stock",
+  "crear_producto",
+  "editar_producto",
+  "desactivar_producto",
+  "ver_historial",
+  "administrar_usuarios",
+  "crear_usuarios",
+  "editar_usuarios",
+  "desactivar_usuarios",
+  "administrar_roles",
+
+  // ========================================
+  // ADMINISTRACIÓN - CAJA
+  // ========================================
+
+  "ver_caja",
+  "crear_caja",
+  "editar_caja",
+  "cerrar_caja",
+
+  // ========================================
+  // ADMINISTRACIÓN - CHEQUES
+  // ========================================
+
+  "ver_cheques",
+  "crear_cheque",
+  "editar_cheque",
+  "cambiar_estado_cheque",
 ];
 
 const UsuarioSchema = new mongoose.Schema(

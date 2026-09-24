@@ -10,6 +10,8 @@ const stockRoutes = require("./routes/stockRoutes");
 const usuarioRoutes = require("./routes/usuarioRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const { iniciarDiscovery, detenerDiscovery, } = require("./discovery/serverDiscovery");
+const cajaRoutes = require("./routes/cajaRoutes");
+const chequeRoutes = require("./routes/chequeRoutes");
 
 const app = express();
 
@@ -47,6 +49,8 @@ app.use("/api/movimientos", movimientoRoutes);
 app.use("/api/stock", stockRoutes);
 app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/caja", cajaRoutes);
+app.use("/api/cheques", chequeRoutes);
 
 
 // ========================================

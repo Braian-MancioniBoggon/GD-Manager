@@ -22,13 +22,5 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
-  },
-  "build": {
-    "appId": "com.gastondamianicrm.cliente",
-    "productName": "Gaston Damiani CRM",
-    "win": {
-      "target": "nsis",
-      "icon": "assets/icon.ico"
-    }
   }
 }
