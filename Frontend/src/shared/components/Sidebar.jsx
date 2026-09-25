@@ -18,6 +18,7 @@ FiRepeat,
 FiClipboard,
 FiSettings,
 FiUser,
+FiCreditCard,
 } from "react-icons/fi";
 import { logo } from "../assets/index";
 
@@ -32,6 +33,7 @@ onHistorial,
 onStock,
 onConfiguracion,
 onPerfil,
+onCheques,
 }) {
 return ( <Box
    w="80px"
@@ -83,6 +85,26 @@ return ( <Box
       </Button>
     </Tooltip>
 
+    <Divider />
+
+    {/* CHEQUES */} 
+    
+    <Tooltip 
+      label="Cheques"
+      placement="right" 
+    > 
+      <Button 
+        variant="ghost" 
+        w="100%" 
+        onClick={onCheques} 
+      > 
+        <Icon 
+          as={FiCreditCard} 
+          boxSize={5} 
+        /> 
+      </Button> 
+    </Tooltip> 
+    
     <Divider />
 
     {/* NUEVO PAPEL */}

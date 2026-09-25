@@ -57,6 +57,12 @@ const chequeSchema = new mongoose.Schema(
       default: null,
     },
 
+    entregadoA: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
     observaciones: {
       type: String,
       default: "",

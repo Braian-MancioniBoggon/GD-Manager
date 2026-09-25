@@ -89,6 +89,8 @@ async function crearCheque(
         fechaDeposito: null,
         fechaEntrega: null,
 
+        entregadoA: "",
+
         observaciones:
           observaciones || "",
 
@@ -357,7 +359,6 @@ async function editarCheque(
 
       detalle:
         "Cheque editado",
-
     });
 
     return res.json({
@@ -413,7 +414,7 @@ async function depositarCheque(
     }
 
     // ========================================
-    // BUSCAR LA CAJA QUE CONTIENE EL CHEQUE
+    // BUSCAR LA CAJA
     // ========================================
 
     const caja =
@@ -538,6 +539,20 @@ async function entregarCheque(
 ) {
   try {
 
+    const {
+      entregadoA,
+    } = req.body;
+
+    if (
+      !entregadoA ||
+      !entregadoA.trim()
+    ) {
+      return res.status(400).json({
+        mensaje:
+          "Debés indicar a quién se entrega el cheque",
+      });
+    }
+
     const cheque =
       await Cheque.findById(
         req.params.id
@@ -561,7 +576,7 @@ async function entregarCheque(
     }
 
     // ========================================
-    // BUSCAR LA CAJA QUE CONTIENE EL CHEQUE
+    // BUSCAR LA CAJA
     // ========================================
 
     const caja =
@@ -580,6 +595,9 @@ async function entregarCheque(
     const estadoAnterior =
       cheque.estado;
 
+    const personaEntrega =
+      entregadoA.trim();
+
     // ========================================
     // ACTUALIZAR CHEQUE
     // ========================================
@@ -589,6 +607,9 @@ async function entregarCheque(
 
     cheque.fechaEntrega =
       new Date();
+
+    cheque.entregadoA =
+      personaEntrega;
 
     await cheque.save();
 
@@ -612,7 +633,7 @@ async function entregarCheque(
         "ENTREGADO",
 
       detalle:
-        "Cheque entregado",
+        `Cheque entregado a ${personaEntrega}`,
     });
 
     // ========================================
@@ -653,6 +674,9 @@ async function entregarCheque(
 
         fechaEntrega:
           cheque.fechaEntrega,
+
+        entregadoA:
+          personaEntrega,
       },
     });
 

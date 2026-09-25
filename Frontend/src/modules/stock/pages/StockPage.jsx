@@ -5,15 +5,13 @@ useDisclosure,
 } from "@chakra-ui/react";
 
 import Sidebar from "../../../shared/components/Sidebar";
-
 import StockTable from "../components/tables/StockTable";
 import DetalleProducto from "../components/cards/DetalleProducto";
-
 import HistorialPage from "../../historial/pages/HistorialPage";
 import DashboardPage from "../../dashboard/pages/DashboardPage";
 import ConfiguracionPage from "../../configuracion/pages/ConfiguracionPage";
-
 import ModalMiPerfil from "../../auth/components/modals/ModalMiPerfil";
+import ChequesPage from "../../cheques/pages/ChequesPage";
 
 import { useStockModal } from "../context/StockModalContext";
 
@@ -79,6 +77,10 @@ return ( <Flex
 
     onStock={() =>
       setPantalla("stock")
+    }
+    
+    onCheques={() => 
+      setPantalla("cheques") 
     }
 
     onDashboard={() =>
@@ -205,6 +207,16 @@ return ( <Flex
 
       </Flex>
 
+    )}
+
+    {/* ============================= */}
+    {/* CHEQUES */}
+    {/* ============================= */}
+
+    {pantalla === "cheques" && ( 
+    
+      <ChequesPage /> 
+      
     )}
 
     {/* ============================= */}
