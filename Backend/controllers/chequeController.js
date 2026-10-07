@@ -539,20 +539,6 @@ async function entregarCheque(
 ) {
   try {
 
-    const {
-      entregadoA,
-    } = req.body;
-
-    if (
-      !entregadoA ||
-      !entregadoA.trim()
-    ) {
-      return res.status(400).json({
-        mensaje:
-          "Debés indicar a quién se entrega el cheque",
-      });
-    }
-
     const cheque =
       await Cheque.findById(
         req.params.id
@@ -576,7 +562,23 @@ async function entregarCheque(
     }
 
     // ========================================
-    // BUSCAR LA CAJA
+    // DATOS DE LA ENTREGA
+    // ========================================
+
+    const entregadoA =
+      String(
+        req.body.entregadoA || ""
+      ).trim();
+
+    if (!entregadoA) {
+      return res.status(400).json({
+        mensaje:
+          "Debe indicar a quién se entrega el cheque",
+      });
+    }
+
+    // ========================================
+    // BUSCAR LA CAJA QUE CONTIENE EL CHEQUE
     // ========================================
 
     const caja =
@@ -595,9 +597,6 @@ async function entregarCheque(
     const estadoAnterior =
       cheque.estado;
 
-    const personaEntrega =
-      entregadoA.trim();
-
     // ========================================
     // ACTUALIZAR CHEQUE
     // ========================================
@@ -609,7 +608,7 @@ async function entregarCheque(
       new Date();
 
     cheque.entregadoA =
-      personaEntrega;
+      entregadoA;
 
     await cheque.save();
 
@@ -633,7 +632,7 @@ async function entregarCheque(
         "ENTREGADO",
 
       detalle:
-        `Cheque entregado a ${personaEntrega}`,
+        `Cheque entregado a ${entregadoA}`,
     });
 
     // ========================================
@@ -676,7 +675,7 @@ async function entregarCheque(
           cheque.fechaEntrega,
 
         entregadoA:
-          personaEntrega,
+          entregadoA,
       },
     });
 

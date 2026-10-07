@@ -11,7 +11,8 @@ import HistorialPage from "../../historial/pages/HistorialPage";
 import DashboardPage from "../../dashboard/pages/DashboardPage";
 import ConfiguracionPage from "../../configuracion/pages/ConfiguracionPage";
 import ModalMiPerfil from "../../auth/components/modals/ModalMiPerfil";
-import ChequesPage from "../../cheques/pages/ChequesPage";
+import ChequesPage from "../../administracion/cheques/pages/ChequesPage";
+import CajaPage from "../../administracion/caja/pages/CajaPage";
 
 import { useStockModal } from "../context/StockModalContext";
 
@@ -77,6 +78,10 @@ return ( <Flex
 
     onStock={() =>
       setPantalla("stock")
+    }
+
+    onCaja={() =>
+      setPantalla("caja")
     }
     
     onCheques={() => 
@@ -217,6 +222,16 @@ return ( <Flex
     
       <ChequesPage /> 
       
+    )}
+
+    {/* ============================= */}
+    {/* CAJA */}
+    {/* ============================= */}
+
+    {pantalla === "caja" && (
+    
+      <CajaPage />
+    
     )}
 
     {/* ============================= */}

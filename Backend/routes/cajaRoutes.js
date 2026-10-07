@@ -15,9 +15,18 @@ const {
   actualizarIngresoManual,
   agregarIngreso,
   actualizarContable,
+  actualizarIngreso,
+  eliminarIngreso,
 
   agregarEgreso,
+  actualizarEgreso,
+  eliminarEgreso,
   agregarGastoBanco,
+  actualizarGastoBanco,
+  eliminarGastoBanco,
+  agregarCheque,
+  actualizarCheque,
+  eliminarCheque,
 
   actualizarCajaFuerte,
 
@@ -106,6 +115,20 @@ router.post(
   agregarIngreso
 );
 
+router.put(
+  "/:id/ingresos/:ingresoId",
+  auth,
+  requierePermiso("editar_caja"),
+  actualizarIngreso
+);
+
+router.delete(
+  "/:id/ingresos/:ingresoId",
+  auth,
+  requierePermiso("editar_caja"),
+  eliminarIngreso
+);
+
 // ========================================
 // CONTABLE
 // ========================================
@@ -128,6 +151,20 @@ router.post(
   agregarEgreso
 );
 
+router.put(
+  "/:id/egresos/:categoria/:egresoId",
+  auth,
+  requierePermiso("editar_caja"),
+  actualizarEgreso
+);
+
+router.delete(
+  "/:id/egresos/:categoria/:egresoId",
+  auth,
+  requierePermiso("editar_caja"),
+  eliminarEgreso
+);
+
 // ========================================
 // GASTOS POR BANCO
 // ========================================
@@ -137,6 +174,45 @@ router.post(
   auth,
   requierePermiso("editar_caja"),
   agregarGastoBanco
+);
+
+router.put(
+  "/:id/gastos-banco/:gastoId",
+  auth,
+  requierePermiso("editar_caja"),
+  actualizarGastoBanco
+);
+
+router.delete(
+  "/:id/gastos-banco/:gastoId",
+  auth,
+  requierePermiso("editar_caja"),
+  eliminarGastoBanco
+);
+
+// ========================================
+// CHEQUES
+// ========================================
+
+router.post(
+  "/:id/cheques",
+  auth,
+  requierePermiso("editar_caja"),
+  agregarCheque
+);
+
+router.put(
+  "/:id/cheques/:chequeId",
+  auth,
+  requierePermiso("editar_caja"),
+  actualizarCheque
+);
+
+router.delete(
+  "/:id/cheques/:chequeId",
+  auth,
+  requierePermiso("editar_caja"),
+  eliminarCheque
 );
 
 // ========================================

@@ -21,7 +21,10 @@ const movimientoCajaSchema = new mongoose.Schema(
 
         "INGRESO_MANUAL",
         "INGRESO",
+
         "CHEQUE",
+        "CHEQUE_DEPOSITADO",
+        "CHEQUE_ENTREGADO",
 
         "EGRESO",
         "EGRESO_BANCO",
