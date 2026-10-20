@@ -25,6 +25,7 @@ export default function ModalAgregarGastoBanco({
   isOpen,
   onClose,
   caja,
+  gastoEditar,
   onAgregado,
 }) {
 
@@ -60,16 +61,38 @@ export default function ModalAgregarGastoBanco({
 
   useEffect(() => {
 
-    if (!isOpen) {
-      return;
-    }
+      if (!isOpen) {
+          return;
+      }
 
-    setDetalle("");
-    setMedio("");
-    setTotal("");
-    setError("");
+      if (gastoEditar) {
 
-  }, [isOpen]);
+          setDetalle(
+              gastoEditar.detalle || ""
+          );
+
+          setMedio(
+              gastoEditar.medio || ""
+          );
+
+          setTotal(
+              gastoEditar.total ?? ""
+          );
+
+      } else {
+
+          setDetalle("");
+          setMedio("");
+          setTotal("");
+
+      }
+
+      setError("");
+
+  }, [
+      isOpen,
+      gastoEditar,
+  ]);
 
 
   // ========================================
@@ -155,18 +178,31 @@ export default function ModalAgregarGastoBanco({
       setGuardando(true);
 
       const respuesta =
-        await api.post(
-          `/caja/${caja._id}/gastos-banco`,
-          {
-            detalle:
-              detalleLimpio,
-
-            medio,
-
-            total:
-              totalNumero,
-          }
-        );
+        gastoEditar
+            ? await api.put(
+                `/caja/${caja._id}/gastos-banco/${gastoEditar._id}`,
+                {
+                    detalle:
+                        detalleLimpio,
+                
+                    medio,
+                
+                    total:
+                        totalNumero,
+                }
+            )
+            : await api.post(
+                `/caja/${caja._id}/gastos-banco`,
+                {
+                    detalle:
+                        detalleLimpio,
+                
+                    medio,
+                
+                    total:
+                        totalNumero,
+                }
+            );
 
       if (onAgregado) {
 
@@ -212,7 +248,10 @@ export default function ModalAgregarGastoBanco({
       <ModalContent>
 
         <ModalHeader>
-          Agregar gasto por banco
+            {gastoEditar
+                ? "Editar gasto por banco"
+                : "Agregar gasto por banco"
+            }
         </ModalHeader>
 
 
@@ -358,11 +397,14 @@ export default function ModalAgregarGastoBanco({
           </Button>
 
           <Button
-            colorScheme="red"
-            onClick={guardar}
-            isLoading={guardando}
+              colorScheme="red"
+              onClick={guardar}
+              isLoading={guardando}
           >
-            Guardar gasto
+              {gastoEditar
+                  ? "Guardar cambios"
+                  : "Guardar gasto"
+              }
           </Button>
 
         </ModalFooter>

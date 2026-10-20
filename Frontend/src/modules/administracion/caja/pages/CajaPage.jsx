@@ -14,6 +14,12 @@ import {
     InputLeftElement,
     Icon,
     useDisclosure,
+    AlertDialog,
+    AlertDialogOverlay,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogBody,
+    AlertDialogFooter,
     Divider,
 } from "@chakra-ui/react";
 
@@ -26,6 +32,7 @@ import {
 
 import {
     useEffect,
+    useRef,
     useState,
 } from "react";
 
@@ -111,6 +118,13 @@ export default function CajaPage() {
         setGastoBancoSeleccionado,
     ] = useState(null);
 
+    const [
+        confirmacion,
+        setConfirmacion,
+    ] = useState(null);
+
+    const cancelarConfirmacionRef = useRef(null);
+
 
     // ========================================
     // ABRIR MODAL EGRESO
@@ -188,50 +202,35 @@ export default function CajaPage() {
     // ELIMINAR CHEQUE
     // ========================================
 
-    const eliminarCheque = async (
-        cheque
-    ) => {
-
+    const eliminarCheque = async (cheque, confirmado = false) => {
         if (!cheque?._id) {
             return;
         }
-
-        const confirmar =
-            window.confirm(
-                `¿Está seguro de eliminar el cheque ${cheque.numero}?`
-            );
-
-        if (!confirmar) {
+    
+        if (!confirmado) {
+            setConfirmacion({
+                mensaje: `¿Está seguro de eliminar el cheque ${cheque.numero}?`,
+                accion: () => eliminarCheque(cheque, true),
+            });
             return;
         }
-
+    
         try {
-
             setError(null);
-
-            const respuesta =
-                await api.delete(
-                    `/caja/${caja._id}/cheques/${cheque._id}`
-                );
-
-            setCaja(
-                respuesta.data.caja
+        
+            const respuesta = await api.delete(
+                `/caja/${caja._id}/cheques/${cheque._id}`
             );
-
+        
+            setCaja(respuesta.data.caja);
         } catch (error) {
-
-            console.error(
-                "Error eliminando cheque:",
-                error
-            );
-
+            console.error("Error eliminando cheque:", error);
+        
             setError(
                 error.response?.data?.mensaje ||
                 "No se pudo eliminar el cheque."
             );
-
         }
-
     };
 
 
@@ -256,50 +255,36 @@ export default function CajaPage() {
     // ELIMINAR INGRESO
     // ========================================
 
-    const eliminarIngreso = async (
-        ingreso
-    ) => {
-    
+    const eliminarIngreso = async (ingreso, confirmado = false) => {
         if (!ingreso?._id) {
             return;
         }
-    
-        const confirmar =
-            window.confirm(
-                `¿Está seguro de eliminar el ingreso de "${ingreso.cliente}"?`
-            );
-        
-        if (!confirmar) {
+
+        if (!confirmado) {
+            setConfirmacion({
+                mensaje: `¿Está seguro de eliminar el ingreso de "${ingreso.cliente}"?`,
+                accion: () => eliminarIngreso(ingreso, true),
+            });
             return;
         }
-    
+
         try {
-        
             setError(null);
-        
-            const respuesta =
-                await api.delete(
-                    `/caja/${caja._id}/ingresos/${ingreso._id}`
-                );
-            
-            setCaja(
-                respuesta.data.caja
+
+            const respuesta = await api.delete(
+                `/caja/${caja._id}/ingresos/${ingreso._id}`
             );
-        
+
+            setCaja(respuesta.data.caja);
+            setIngresoSeleccionado(null);
         } catch (error) {
-        
-            console.error(
-                "Error eliminando ingreso:",
-                error
-            );
-        
+            console.error("Error eliminando ingreso:", error);
+
             setError(
                 error.response?.data?.mensaje ||
                 "No se pudo eliminar el ingreso."
             );
-        
         }
-    
     };
 
 
@@ -333,49 +318,38 @@ export default function CajaPage() {
 
     const eliminarEgreso = async (
         egreso,
-        categoria
+        categoria,
+        confirmado = false
     ) => {
-
         if (!egreso?._id) {
             return;
         }
 
-        const confirmar =
-            window.confirm(
-                `¿Está seguro de eliminar el egreso "${egreso.detalle}"?`
-            );
-
-        if (!confirmar) {
+        if (!confirmado) {
+            setConfirmacion({
+                mensaje: `¿Está seguro de eliminar el egreso "${egreso.detalle}"?`,
+                accion: () => eliminarEgreso(egreso, categoria, true),
+            });
             return;
         }
 
         try {
-
             setError(null);
 
-            const respuesta =
-                await api.delete(
-                    `/caja/${caja._id}/egresos/${categoria}/${egreso._id}`
-                );
-
-            setCaja(
-                respuesta.data.caja
+            const respuesta = await api.delete(
+                `/caja/${caja._id}/egresos/${categoria}/${egreso._id}`
             );
 
+            setCaja(respuesta.data.caja);
+            setEgresoSeleccionado(null);
         } catch (error) {
-
-            console.error(
-                "Error eliminando egreso:",
-                error
-            );
+            console.error("Error eliminando egreso:", error);
 
             setError(
                 error.response?.data?.mensaje ||
                 "No se pudo eliminar el egreso."
             );
-
         }
-
     };
 
 
@@ -404,49 +378,38 @@ export default function CajaPage() {
     // ========================================
 
     const eliminarGastoBanco = async (
-        gasto
+        gasto,
+        confirmado = false
     ) => {
-
         if (!gasto?._id) {
             return;
         }
 
-        const confirmar =
-            window.confirm(
-                `¿Está seguro de eliminar el gasto "${gasto.detalle}"?`
-            );
-
-        if (!confirmar) {
+        if (!confirmado) {
+            setConfirmacion({
+                mensaje: `¿Está seguro de eliminar el gasto "${gasto.detalle}"?`,
+                accion: () => eliminarGastoBanco(gasto, true),
+            });
             return;
         }
 
         try {
-
             setError(null);
 
-            const respuesta =
-                await api.delete(
-                    `/caja/${caja._id}/gastos-banco/${gasto._id}`
-                );
-
-            setCaja(
-                respuesta.data.caja
+            const respuesta = await api.delete(
+                `/caja/${caja._id}/gastos-banco/${gasto._id}`
             );
 
+            setCaja(respuesta.data.caja);
+            setGastoBancoSeleccionado(null);
         } catch (error) {
-
-            console.error(
-                "Error eliminando gasto por banco:",
-                error
-            );
+            console.error("Error eliminando gasto por banco:", error);
 
             setError(
                 error.response?.data?.mensaje ||
                 "No se pudo eliminar el gasto."
             );
-
         }
-
     };
 
 
@@ -1106,11 +1069,12 @@ export default function CajaPage() {
                         <Button
                             size="sm"
                             colorScheme="red"
-                            onClick={() =>
+                            onClick={() => {
+                                setEgresoSeleccionado(null);
                                 abrirEgreso(
                                     categoria
-                                )
-                            }
+                                );
+                            }}
                         >
                             Agregar
                         </Button>
@@ -1153,7 +1117,7 @@ export default function CajaPage() {
                     >
 
                         <Flex
-                            minW="700px"
+                            minW="800px"
                             px={6}
                             py={3}
                             bg="gray.50"
@@ -1195,6 +1159,17 @@ export default function CajaPage() {
                                 </Text>
                             </Box>
 
+                            <Box w="100px">
+                                <Text
+                                    fontSize="xs"
+                                    fontWeight="700"
+                                    color="gray.500"
+                                    textTransform="uppercase"
+                                >
+                                    Acciones
+                                </Text>
+                            </Box>
+
                         </Flex>
 
 
@@ -1205,7 +1180,7 @@ export default function CajaPage() {
                                     key={
                                         item._id
                                     }
-                                    minW="700px"
+                                    minW="800px"
                                     px={6}
                                     py={4}
                                     align="center"
@@ -1251,6 +1226,59 @@ export default function CajaPage() {
                                             )}
                                         </Text>
 
+                                    </Box>
+
+                                    <Box
+                                        w="100px"
+                                    >
+
+                                        <Flex
+                                            gap={1}
+                                            justify="flex-end"
+                                        >
+                                        
+                                            {estaAbierta && (
+                                            
+                                                <>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        colorScheme="blue"
+                                                        onClick={() =>
+                                                            editarEgreso(
+                                                                item,
+                                                                categoria
+                                                            )
+                                                        }
+                                                        title="Editar"
+                                                    >
+                                                        <Icon
+                                                            as={FiEdit}
+                                                        />
+                                                    </Button>
+                                                    
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        colorScheme="red"
+                                                        onClick={() =>
+                                                            eliminarEgreso(
+                                                                item,
+                                                                categoria
+                                                            )
+                                                        }
+                                                        title="Eliminar"
+                                                    >
+                                                        <Icon
+                                                            as={FiTrash2}
+                                                        />
+                                                    </Button>
+                                                </>
+
+                                            )}
+
+                                        </Flex>
+                                        
                                     </Box>
 
                                 </Flex>
@@ -1570,9 +1598,10 @@ export default function CajaPage() {
                             <Button
                                 size="sm"
                                 colorScheme="red"
-                                onClick={
-                                    modalIngreso.onOpen
-                                }
+                                onClick={() => {
+                                    setIngresoSeleccionado(null);
+                                    modalIngreso.onOpen();
+                                }}
                             >
                                 Agregar ingreso
                             </Button>
@@ -1614,7 +1643,7 @@ export default function CajaPage() {
                         >
 
                             <Flex
-                                minW="750px"
+                                minW="850px"
                                 px={6}
                                 py={3}
                                 bg="gray.50"
@@ -1688,7 +1717,7 @@ export default function CajaPage() {
                                         key={
                                             ingreso._id
                                         }
-                                        minW="750px"
+                                        minW="850px"
                                         px={6}
                                         py={4}
                                         align="center"
@@ -1761,6 +1790,57 @@ export default function CajaPage() {
                                                 }
                                             </Badge>
 
+                                        </Box>
+
+                                        <Box
+                                            w="100px"
+                                        >
+
+                                            <Flex
+                                                gap={1}
+                                                justify="flex-end"
+                                            >
+                                            
+                                                {estaAbierta && (
+                                                
+                                                    <>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="ghost"
+                                                            colorScheme="blue"
+                                                            onClick={() =>
+                                                                editarIngreso(
+                                                                    ingreso
+                                                                )
+                                                            }
+                                                            title="Editar"
+                                                        >
+                                                            <Icon
+                                                                as={FiEdit}
+                                                            />
+                                                        </Button>
+                                                        
+                                                        <Button
+                                                            size="sm"
+                                                            variant="ghost"
+                                                            colorScheme="red"
+                                                            onClick={() =>
+                                                                eliminarIngreso(
+                                                                    ingreso
+                                                                )
+                                                            }
+                                                            title="Eliminar"
+                                                        >
+                                                            <Icon
+                                                                as={FiTrash2}
+                                                            />
+                                                        </Button>
+                                                    </>
+
+                                                )}
+
+                                            </Flex>
+                                            
                                         </Box>
 
                                     </Flex>
@@ -1885,7 +1965,7 @@ export default function CajaPage() {
                         <Box overflowX="auto">
 
                             <Flex
-                                minW="950px"
+                                minW="1050px"
                                 px={6}
                                 py={3}
                                 bg="gray.50"
@@ -1946,6 +2026,17 @@ export default function CajaPage() {
                                         textTransform="uppercase"
                                     >
                                         Importe
+                                    </Text>
+                                </Box>
+
+                                <Box w="100px">
+                                    <Text
+                                        fontSize="xs"
+                                        fontWeight="700"
+                                        color="gray.500"
+                                        textTransform="uppercase"
+                                    >
+                                        Acciones
                                     </Text>
                                 </Box>
 
@@ -2049,6 +2140,58 @@ export default function CajaPage() {
                                                     )}
                                                 </Text>
 
+                                            </Box>
+
+                                            <Box
+                                                w="100px"
+                                            >
+
+                                                <Flex
+                                                    gap={1}
+                                                    justify="flex-end"
+                                                >
+                                                
+                                                    {estaAbierta &&
+                                                        cheque?.estado === "PENDIENTE" && (
+                                                        
+                                                        <>
+                                                            <Button
+                                                                size="sm"
+                                                                variant="ghost"
+                                                                colorScheme="blue"
+                                                                onClick={() =>
+                                                                    abrirCheque(
+                                                                        cheque
+                                                                    )
+                                                                }
+                                                                title="Editar"
+                                                            >
+                                                                <Icon
+                                                                    as={FiEdit}
+                                                                />
+                                                            </Button>
+                                                            
+                                                            <Button
+                                                                size="sm"
+                                                                variant="ghost"
+                                                                colorScheme="red"
+                                                                onClick={() =>
+                                                                    eliminarCheque(
+                                                                        cheque
+                                                                    )
+                                                                }
+                                                                title="Eliminar"
+                                                            >
+                                                                <Icon
+                                                                    as={FiTrash2}
+                                                                />
+                                                            </Button>
+                                                        </>
+
+                                                    )}
+
+                                                </Flex>
+                                                
                                             </Box>
 
                                         </Flex>
@@ -2181,9 +2324,10 @@ export default function CajaPage() {
                             <Button
                                 size="sm"
                                 colorScheme="red"
-                                onClick={
-                                    abrirGastoBanco
-                                }
+                                onClick={() => {
+                                    setGastoBancoSeleccionado(null);
+                                    abrirGastoBanco();
+                                }}
                             >
                                 Agregar
                             </Button>
@@ -2223,7 +2367,7 @@ export default function CajaPage() {
                         <Box overflowX="auto">
 
                             <Flex
-                                minW="750px"
+                                minW="850px"
                                 px={6}
                                 py={3}
                                 bg="gray.50"
@@ -2267,6 +2411,19 @@ export default function CajaPage() {
                                         textTransform="uppercase"
                                     >
                                         Total
+                                    </Text>
+
+                                </Box>
+
+                                <Box w="100px">
+
+                                    <Text
+                                        fontSize="xs"
+                                        fontWeight="700"
+                                        color="gray.500"
+                                        textTransform="uppercase"
+                                    >
+                                        Acciones
                                     </Text>
 
                                 </Box>
@@ -2334,6 +2491,57 @@ export default function CajaPage() {
                                                 )}
                                             </Text>
 
+                                        </Box>
+
+                                        <Box
+                                            w="100px"
+                                        >
+                                                                                    
+                                            <Flex
+                                                gap={1}
+                                                justify="flex-end"
+                                            >
+                                            
+                                                {estaAbierta && (
+                                                
+                                                    <>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="ghost"
+                                                            colorScheme="blue"
+                                                            onClick={() =>
+                                                                editarGastoBanco(
+                                                                    gasto
+                                                                )
+                                                            }
+                                                            title="Editar"
+                                                        >
+                                                            <Icon
+                                                                as={FiEdit}
+                                                            />
+                                                        </Button>
+                                                        
+                                                        <Button
+                                                            size="sm"
+                                                            variant="ghost"
+                                                            colorScheme="red"
+                                                            onClick={() =>
+                                                                eliminarGastoBanco(
+                                                                    gasto
+                                                                )
+                                                            }
+                                                            title="Eliminar"
+                                                        >
+                                                            <Icon
+                                                                as={FiTrash2}
+                                                            />
+                                                        </Button>
+                                                    </>
+                                        
+                                                )}
+                                        
+                                            </Flex>
+                                            
                                         </Box>
 
                                     </Flex>
@@ -2584,21 +2792,14 @@ export default function CajaPage() {
             ================================== */}
 
             <ModalAgregarIngreso
-                isOpen={
-                    modalIngreso.isOpen
-                }
-
-                onClose={
-                    modalIngreso.onClose
-                }
-
-                caja={
-                    caja
-                }
-
-                onAgregado={
-                    actualizarCajaDesdeModal
-                }
+                isOpen={modalIngreso.isOpen}
+                onClose={() => {
+                    modalIngreso.onClose();
+                    setIngresoSeleccionado(null);
+                }}
+                caja={caja}
+                ingresoEditar={ingresoSeleccionado}
+                onAgregado={actualizarCajaDesdeModal}
             />
 
 
@@ -2606,28 +2807,16 @@ export default function CajaPage() {
                 MODAL EGRESO
             ================================== */}
 
-            <ModalAgregarEgreso
-                isOpen={
-                    egresoModalAbierto
-                }
-
-                onClose={() =>
-                    setEgresoModalAbierto(
-                        false
-                    )
-                }
-
-                caja={
-                    caja
-                }
-
-                categoria={
-                    categoriaEgreso
-                }
-
-                onAgregado={
-                    actualizarCajaDesdeModal
-                }
+           <ModalAgregarEgreso
+                isOpen={egresoModalAbierto}
+                onClose={() => {
+                    setEgresoModalAbierto(false);
+                    setEgresoSeleccionado(null);
+                }}
+                caja={caja}
+                categoria={categoriaEgreso}
+                egresoEditar={egresoSeleccionado}
+                onAgregado={actualizarCajaDesdeModal}
             />
 
 
@@ -2636,23 +2825,14 @@ export default function CajaPage() {
             ================================== */}
 
             <ModalAgregarGastoBanco
-                isOpen={
-                    gastoBancoModalAbierto
-                }
-
-                onClose={() =>
-                    setGastoBancoModalAbierto(
-                        false
-                    )
-                }
-
-                caja={
-                    caja
-                }
-
-                onAgregado={
-                    actualizarCajaDesdeModal
-                }
+                isOpen={gastoBancoModalAbierto}
+                onClose={() => {
+                    setGastoBancoModalAbierto(false);
+                    setGastoBancoSeleccionado(null);
+                }}
+                caja={caja}
+                gastoEditar={gastoBancoSeleccionado}
+                onAgregado={actualizarCajaDesdeModal}
             />
 
             {/* ========================================
@@ -2660,24 +2840,63 @@ export default function CajaPage() {
             ======================================== */}
             
             <ModalAgregarCheque
-                isOpen={
-                    chequeModalAbierto
-                }
-            
-                onClose={() =>
-                    setChequeModalAbierto(
-                        false
-                    )
-                }
-            
-                caja={
-                    caja
-                }
-            
-                onAgregado={
-                    actualizarCajaDesdeModal
-                }
+                isOpen={chequeModalAbierto}
+                onClose={() => {
+                    setChequeModalAbierto(false);
+                    setChequeSeleccionado(null);
+                }}
+                caja={caja}
+                chequeEditar={chequeSeleccionado}
+                onAgregado={actualizarCajaDesdeModal}
             />
+            
+            {/* ========================================
+                CONFIRMACIÓN DE ELIMINACIÓN
+            ======================================== */}
+
+            <AlertDialog
+                isOpen={Boolean(confirmacion)}
+                leastDestructiveRef={cancelarConfirmacionRef}
+                onClose={() => setConfirmacion(null)}
+                isCentered
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent mx={4}>
+                        <AlertDialogHeader fontSize="lg" fontWeight="700">
+                            Confirmar eliminación
+                        </AlertDialogHeader>
+
+                        <AlertDialogBody>
+                            {confirmacion?.mensaje}
+                        </AlertDialogBody>
+
+                        <AlertDialogFooter gap={3}>
+                            <Button
+                                ref={cancelarConfirmacionRef}
+                                variant="ghost"
+                                onClick={() => setConfirmacion(null)}
+                            >
+                                Cancelar
+                            </Button>
+
+                            <Button
+                                colorScheme="red"
+                                onClick={() => {
+                                    const accion = confirmacion?.accion;
+                                
+                                    setConfirmacion(null);
+                                
+                                    if (accion) {
+                                        accion();
+                                    }
+                                }}
+                            >
+                                Eliminar
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
 
         </Flex>
 

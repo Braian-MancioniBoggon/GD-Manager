@@ -25,6 +25,7 @@ export default function ModalAgregarEgreso({
   onClose,
   caja,
   categoria,
+  egresoEditar,
   onAgregado,
 }) {
 
@@ -98,18 +99,38 @@ export default function ModalAgregarEgreso({
 
   useEffect(() => {
 
-    if (!isOpen) {
-      return;
-    }
-
-    setProveedor("");
-    setDetalle("");
-    setImporte("");
-    setError("");
-
+      if (!isOpen) {
+          return;
+      }
+    
+      if (egresoEditar) {
+      
+          setProveedor(
+              egresoEditar.proveedor || ""
+          );
+        
+          setDetalle(
+              egresoEditar.detalle || ""
+          );
+        
+          setImporte(
+              egresoEditar.importe ?? ""
+          );
+        
+      } else {
+      
+          setProveedor("");
+          setDetalle("");
+          setImporte("");
+      
+      }
+    
+      setError("");
+    
   }, [
-    isOpen,
-    categoria,
+      isOpen,
+      categoria,
+      egresoEditar,
   ]);
 
 
@@ -199,19 +220,33 @@ export default function ModalAgregarEgreso({
       setGuardando(true);
 
       const respuesta =
-        await api.post(
-          `/caja/${caja._id}/egresos/${categoria}`,
-          {
-            proveedor:
-              proveedorLimpio,
-
-            detalle:
-              detalleLimpio,
-
-            importe:
-              importeNumero,
-          }
-        );
+        egresoEditar
+            ? await api.put(
+                `/caja/${caja._id}/egresos/${categoria}/${egresoEditar._id}`,
+                {
+                    proveedor:
+                        proveedorLimpio,
+                
+                    detalle:
+                        detalleLimpio,
+                
+                    importe:
+                        importeNumero,
+                }
+            )
+            : await api.post(
+                `/caja/${caja._id}/egresos/${categoria}`,
+                {
+                    proveedor:
+                        proveedorLimpio,
+                
+                    detalle:
+                        detalleLimpio,
+                
+                    importe:
+                        importeNumero,
+                }
+            );
 
       if (onAgregado) {
 
@@ -257,7 +292,10 @@ export default function ModalAgregarEgreso({
       <ModalContent>
 
         <ModalHeader>
-          {config.titulo}
+            {egresoEditar
+                ? "Editar egreso"
+                : config.titulo
+            }
         </ModalHeader>
 
 
@@ -384,11 +422,14 @@ export default function ModalAgregarEgreso({
           </Button>
 
           <Button
-            colorScheme="red"
-            onClick={guardar}
-            isLoading={guardando}
+              colorScheme="red"
+              onClick={guardar}
+              isLoading={guardando}
           >
-            Guardar egreso
+              {egresoEditar
+                  ? "Guardar cambios"
+                  : "Guardar egreso"
+              }
           </Button>
 
         </ModalFooter>

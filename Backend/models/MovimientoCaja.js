@@ -21,17 +21,34 @@ const movimientoCajaSchema = new mongoose.Schema(
 
         "INGRESO_MANUAL",
         "INGRESO",
+        "ACTUALIZACION_INGRESO",
+        "ELIMINACION_INGRESO",
 
         "CHEQUE",
         "CHEQUE_DEPOSITADO",
         "CHEQUE_ENTREGADO",
+        "ACTUALIZACION_CHEQUE",
+        "ELIMINACION_CHEQUE",
 
         "EGRESO",
+        "ACTUALIZACION_EGRESO",
+        "ELIMINACION_EGRESO",
+
         "EGRESO_BANCO",
+        "ACTUALIZACION_EGRESO_BANCO",
+        "ELIMINACION_EGRESO_BANCO",
+
         "RETIRO_ADELANTO",
+        "ACTUALIZACION_RETIRO_ADELANTO",
+        "ELIMINACION_RETIRO_ADELANTO",
+
         "FLETE",
+        "ACTUALIZACION_FLETE",
+        "ELIMINACION_FLETE",
 
         "GASTO_BANCO",
+        "ACTUALIZACION_GASTO_BANCO",
+        "ELIMINACION_GASTO_BANCO",
 
         "CAJA_FUERTE",
 

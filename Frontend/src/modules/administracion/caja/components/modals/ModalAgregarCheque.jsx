@@ -17,6 +17,7 @@ import {
 } from "@chakra-ui/react";
 
 import {
+  useEffect,
   useState,
 } from "react";
 
@@ -26,6 +27,7 @@ export default function ModalAgregarCheque({
   isOpen,
   onClose,
   caja,
+  chequeEditar,
   onAgregado,
 }) {
 
@@ -71,6 +73,65 @@ export default function ModalAgregarCheque({
     guardando,
     setGuardando,
   ] = useState(false);
+
+  useEffect(() => {
+
+      if (!isOpen) {
+          return;
+      }
+
+      if (chequeEditar) {
+
+          setNumero(
+              chequeEditar.numero || ""
+          );
+
+          setBanco(
+              chequeEditar.banco || ""
+          );
+
+          setLibrador(
+              chequeEditar.librador || ""
+          );
+
+          setImporte(
+              chequeEditar.importe ?? ""
+          );
+
+          setFechaEmision(
+              chequeEditar.fechaEmision
+                  ? new Date(
+                      chequeEditar.fechaEmision
+                  )
+                      .toISOString()
+                      .slice(0, 10)
+                  : ""
+          );
+
+          setFechaVencimiento(
+              chequeEditar.fechaVencimiento
+                  ? new Date(
+                      chequeEditar.fechaVencimiento
+                  )
+                      .toISOString()
+                      .slice(0, 10)
+                  : ""
+          );
+
+          setObservaciones(
+              chequeEditar.observaciones || ""
+          );
+
+      } else {
+
+          limpiar();
+
+      }
+
+  }, [
+      isOpen,
+      chequeEditar,
+  ]);
 
 
   // ========================================
@@ -170,29 +231,30 @@ export default function ModalAgregarCheque({
 
       try {
 
-        const respuesta =
-          await api.post(
-            `/caja/${caja._id}/cheques`,
-            {
-              numero:
-                numero.trim(),
-
-              banco:
-                banco.trim(),
-
-              librador:
-                librador.trim(),
-
-              importe:
-                importeNumero,
-
-              fechaEmision,
-
-              fechaVencimiento,
-
-              observaciones:
-                observaciones.trim(),
-            }
+        const respuesta = chequeEditar?._id
+          ? await api.put(
+              `/caja/${caja._id}/cheques/${chequeEditar._id}`,
+              {
+                  numero: numero.trim(),
+                  banco: banco.trim(),
+                  librador: librador.trim(),
+                  importe: importeNumero,
+                  fechaEmision,
+                  fechaVencimiento,
+                  observaciones: observaciones.trim(),
+              }
+          )
+          : await api.post(
+              `/caja/${caja._id}/cheques`,
+              {
+                  numero: numero.trim(),
+                  banco: banco.trim(),
+                  librador: librador.trim(),
+                  importe: importeNumero,
+                  fechaEmision,
+                  fechaVencimiento,
+                  observaciones: observaciones.trim(),
+              }
           );
 
         if (
@@ -263,7 +325,10 @@ export default function ModalAgregarCheque({
       <ModalContent>
 
         <ModalHeader>
-          Agregar cheque
+            {chequeEditar
+                ? "Editar cheque"
+                : "Agregar cheque"
+            }
         </ModalHeader>
 
         <ModalCloseButton />
@@ -476,14 +541,14 @@ export default function ModalAgregarCheque({
           </Button>
 
           <Button
-            colorScheme="red"
-            onClick={guardar}
-            isLoading={
-              guardando
-            }
-            loadingText="Guardando..."
+              colorScheme="red"
+              onClick={guardar}
+              isLoading={guardando}
           >
-            Agregar cheque
+              {chequeEditar
+                  ? "Guardar cambios"
+                  : "Agregar cheque"
+              }
           </Button>
 
         </ModalFooter>
