@@ -9,6 +9,7 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Select,
   SimpleGrid,
   Button,
   Text,
@@ -73,6 +74,115 @@ export default function ModalAgregarCheque({
     guardando,
     setGuardando,
   ] = useState(false);
+
+  const [bancosDisponibles, setBancosDisponibles] = useState([]);
+  const [cargandoBancos, setCargandoBancos] = useState(false);
+
+  const bancosFallback = [
+    "BANCO BBVA ARGENTINA S.A.",
+    "BANCO BICA S.A.",
+    "BANCO CMF S.A.",
+    "BANCO COINAG S.A.",
+    "BANCO COLUMBIA S.A.",
+    "BANCO COMAFI S.A.",
+    "BANCO CREDICOOP COOPERATIVO LIMITADO",
+    "BANCO DE COMERCIO S.A.",
+    "BANCO DE CORRIENTES S.A.",
+    "BANCO DE FORMOSA S.A.",
+    "BANCO DE GALICIA Y BUENOS AIRES S.A.",
+    "BANCO DE LA CIUDAD DE BUENOS AIRES",
+    "BANCO DE LA NACIÓN ARGENTINA",
+    "BANCO DE LA PAMPA S.E.M.",
+    "BANCO DE LA PROVINCIA DE BUENOS AIRES",
+    "BANCO DE LA PROVINCIA DE CÓRDOBA S.A.",
+    "BANCO DE LA REPÚBLICA ORIENTAL DEL URUGUAY",
+    "BANCO DE SAN JUAN S.A.",
+    "BANCO DE SANTA CRUZ S.A.",
+    "BANCO DE SANTIAGO DEL ESTERO S.A.",
+    "BANCO DE VALORES S.A.",
+    "BANCO DEL CHUBUT S.A.",
+    "BANCO DEL SOL S.A.",
+    "BANCO DINO S.A.",
+    "BANCO HIPOTECARIO S.A.",
+    "BANCO INDUSTRIAL S.A.",
+    "BANCO JULIO S.A.",
+    "BANCO MACRO S.A.",
+    "BANCO MARIVA S.A.",
+    "BANCO MASVENTAS S.A.",
+    "BANCO MERIDIAN S.A.",
+    "BANCO MUNICIPAL DE ROSARIO",
+    "BANCO PATAGONIA S.A.",
+    "BANCO PIANO S.A.",
+    "BANCO PROVINCIA DE TIERRA DEL FUEGO",
+    "BANCO PROVINCIA DEL NEUQUÉN S.A.",
+    "BANCO ROELA S.A.",
+    "BANCO SAENZ S.A.",
+    "BANCO SANTANDER ARGENTINA S.A.",
+    "BANCO SUCREDITO REGIONAL S.A.U.",
+    "BANCO SUPERVIELLE S.A.",
+    "BIBANK S.A.",
+    "BNP PARIBAS",
+    "CITIBANK N.A.",
+    "INDUSTRIAL AND COMMERCIAL BANK OF CHINA (ARGENTINA) S.A.",
+    "JPMORGAN CHASE BANK, NATIONAL ASSOCIATION",
+    "NUEVO BANCO DE ENTRE RÍOS S.A.",
+    "NUEVO BANCO DE SANTA FE S.A.",
+    "NUEVO BANCO DEL CHACO S.A.",
+  ];
+
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    let cancelado = false;
+    
+    const cargarBancos = async () => {
+      setCargandoBancos(true);
+    
+      try {
+        const respuesta = await fetch(
+          "https://api.bcra.gob.ar/cheques/v1.0/entidades"
+        );
+      
+        if (!respuesta.ok) {
+          throw new Error("No se pudo consultar el BCRA");
+        }
+      
+        const datos = await respuesta.json();
+      
+        const nombres = (datos.results || [])
+          .map((entidad) => entidad.denominacion?.trim())
+          .filter(Boolean);
+      
+        if (!nombres.length) {
+          throw new Error("El BCRA no devolvió entidades");
+        }
+      
+        if (!cancelado) {
+          setBancosDisponibles(
+            [...new Set(nombres)].sort((a, b) =>
+              a.localeCompare(b, "es")
+            )
+          );
+        }
+      } catch (error) {
+        console.error("Error cargando bancos del BCRA:", error);
+      
+        if (!cancelado) {
+          setBancosDisponibles(bancosFallback);
+        }
+      } finally {
+        if (!cancelado) {
+          setCargandoBancos(false);
+        }
+      }
+    };
+  
+    cargarBancos();
+  
+    return () => {
+      cancelado = true;
+    };
+  }, [isOpen]);
 
   useEffect(() => {
 
@@ -377,24 +487,32 @@ export default function ModalAgregarCheque({
 
             {/* BANCO */}
 
-            <FormControl
-              isRequired
-            >
+            <FormControl isRequired>
+              <FormLabel>Banco</FormLabel>
 
-              <FormLabel>
-                Banco
-              </FormLabel>
-
-              <Input
+              <Select
                 value={banco}
-                onChange={(e) =>
-                  setBanco(
-                    e.target.value
-                  )
+                onChange={(e) => setBanco(e.target.value)}
+                placeholder={
+                  cargandoBancos
+                    ? "Cargando bancos..."
+                    : "Seleccioná un banco"
                 }
-                placeholder=""
-              />
+                isDisabled={cargandoBancos}
+              >
+                {banco &&
+                  !bancosDisponibles.includes(banco) && (
+                    <option value={banco}>
+                      {banco}
+                    </option>
+                  )}
 
+                {bancosDisponibles.map((nombreBanco) => (
+                  <option key={nombreBanco} value={nombreBanco}>
+                    {nombreBanco}
+                  </option>
+                ))}
+              </Select>
             </FormControl>
 
 

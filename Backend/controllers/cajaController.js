@@ -143,6 +143,36 @@ function prepararCaja(caja) {
   };
 }
 
+async function cerrarCajaInterna(caja, usuarioId) {
+  if (!caja || caja.estado === "CERRADA") {
+    return caja;
+  }
+
+  const datos = prepararCaja(caja);
+
+  caja.cajaChica = datos.cajaChica;
+  caja.estado = "CERRADA";
+  caja.usuarioCierre = usuarioId;
+  caja.fechaCierre = new Date();
+
+  await caja.save();
+
+  await MovimientoCaja.create({
+    cajaId: caja._id,
+    usuarioId,
+    tipo: "CIERRE",
+    detalle: "Cierre automático de caja por cambio de día",
+    datos: {
+      efectivo: datos.efectivo,
+      totalCheques: datos.totalCheques,
+      aCajaFuerte: caja.aCajaFuerte,
+      cajaChica: caja.cajaChica,
+    },
+  });
+
+  return caja;
+}
+
 // ========================================
 // OBTENER CAJA DEL DÍA
 // ========================================
@@ -180,6 +210,22 @@ async function obtenerCajaActual(
           "nombre color avatar"
         );
 
+        // Solo cerrar automáticamente cuando se consulta
+      // la caja del día actual, sin una fecha histórica.
+      if (!req.query.fecha) {
+        const cajasAbiertasAnteriores = await Caja.find({
+          fecha: { $lt: inicio },
+          estado: "ABIERTA",
+        });
+      
+        for (const cajaAnterior of cajasAbiertasAnteriores) {
+          await cerrarCajaInterna(
+            cajaAnterior,
+            req.usuario._id
+          );
+        }
+      }
+
     if (!caja) {
       return res.json({
         caja: null,
@@ -215,7 +261,7 @@ async function obtenerCajas(
   try {
 
     const cajas =
-      await Caja.find()
+      await Caja.find({ estado: "CERRADA", })
         .sort({
           fecha: -1,
         })
@@ -342,6 +388,18 @@ async function crearCaja(
           "Ya existe una caja para esa fecha",
       });
 
+    }
+
+    const cajasAbiertasAnteriores = await Caja.find({
+      fecha: { $lt: inicio },
+      estado: "ABIERTA",
+    });
+
+    for (const cajaAnterior of cajasAbiertasAnteriores) {
+      await cerrarCajaInterna(
+        cajaAnterior,
+        req.usuario._id
+      );
     }
 
     // ========================================

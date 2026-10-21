@@ -28,6 +28,9 @@ import {
     FiPlus,
     FiEdit,
     FiTrash2,
+    FiCheck,
+    FiX,
+    FiArrowLeft,
 } from "react-icons/fi";
 
 import {
@@ -43,7 +46,7 @@ import ModalAgregarEgreso from "../components/modals/ModalAgregarEgreso";
 import ModalAgregarGastoBanco from "../components/modals/ModalAgregarGastoBanco";
 import ModalAgregarCheque from "../components/modals/ModalAgregarCheque";
 
-export default function CajaPage() {
+export default function CajaPage({ cajaId = null, modoConsulta = false, onVolver }) {
 
     const [
         caja,
@@ -107,6 +110,11 @@ export default function CajaPage() {
         ingresoSeleccionado,
         setIngresoSeleccionado,
     ] = useState(null);
+
+    const [contableEditandoId, setContableEditandoId] = useState(null);
+    const [contableFecha, setContableFecha] = useState("");
+    const [guardandoContableId, setGuardandoContableId] = useState(null);
+    const [errorContable, setErrorContable] = useState("");
 
     const [
         egresoSeleccionado,
@@ -248,6 +256,77 @@ export default function CajaPage() {
 
         modalIngreso.onOpen();
 
+    };
+
+
+    // ========================================
+    // EDITAR FECHA CONTABLE DESDE LA TABLA
+    // ========================================
+
+    const obtenerFechaParaInput = (fecha) => {
+        if (!fecha) return "";
+
+        if (typeof fecha === "string" && /^\d{4}-\d{2}-\d{2}/.test(fecha)) {
+            return fecha.slice(0, 10);
+        }
+
+        const fechaConvertida = new Date(fecha);
+        if (Number.isNaN(fechaConvertida.getTime())) return "";
+
+        const anio = fechaConvertida.getFullYear();
+        const mes = String(fechaConvertida.getMonth() + 1).padStart(2, "0");
+        const dia = String(fechaConvertida.getDate()).padStart(2, "0");
+        return `${anio}-${mes}-${dia}`;
+    };
+
+    const iniciarEdicionContable = (ingreso) => {
+        setContableEditandoId(ingreso._id);
+        setContableFecha(obtenerFechaParaInput(ingreso.contable));
+        setErrorContable("");
+    };
+
+    const cancelarEdicionContable = () => {
+        setContableEditandoId(null);
+        setContableFecha("");
+        setErrorContable("");
+    };
+
+    const guardarFechaContable = async (ingreso) => {
+        if (!ingreso?._id || !caja?._id || guardandoContableId) return;
+
+        try {
+            setGuardandoContableId(ingreso._id);
+            setErrorContable("");
+
+            const respuesta = await api.put(
+                `/caja/${caja._id}/ingresos/${ingreso._id}/contable`,
+                { contable: contableFecha || null }
+            );
+
+            if (respuesta.data?.caja) {
+                setCaja(respuesta.data.caja);
+            } else {
+                // Respaldo si el endpoint devuelve solamente el ingreso actualizado.
+                setCaja((cajaActual) => ({
+                    ...cajaActual,
+                    ingresos: (cajaActual?.ingresos || []).map((item) =>
+                        item._id === ingreso._id
+                            ? { ...item, contable: contableFecha || null }
+                            : item
+                    ),
+                }));
+            }
+
+            cancelarEdicionContable();
+        } catch (error) {
+            console.error("Error actualizando fecha contable:", error);
+            setErrorContable(
+                error.response?.data?.mensaje ||
+                "No se pudo actualizar la fecha contable."
+            );
+        } finally {
+            setGuardandoContableId(null);
+        }
     };
 
 
@@ -427,7 +506,7 @@ export default function CajaPage() {
 
             const respuesta =
                 await api.get(
-                    "/caja/actual"
+                    cajaId ? `/caja/${cajaId}` : "/caja/actual"
                 );
 
             setCaja(
@@ -462,7 +541,7 @@ export default function CajaPage() {
 
         obtenerCaja();
 
-    }, []);
+    }, [cajaId]);
 
 
     // ========================================
@@ -491,20 +570,27 @@ export default function CajaPage() {
     // FORMATEAR FECHA
     // ========================================
 
-    const formatearFecha = (
-        fecha
-    ) => {
-
+    const formatearFecha = (fecha) => {
         if (!fecha) {
             return "-";
         }
 
-        return new Date(
-            fecha
-        ).toLocaleDateString(
-            "es-AR"
-        );
+        // Las fechas YYYY-MM-DD son fechas contables sin hora.
+        // No convertirlas con new Date(), porque UTC-3 puede restar un día.
+        if (typeof fecha === "string") {
+            const coincidencia = fecha.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (coincidencia) {
+                const [, anio, mes, dia] = coincidencia;
+                return `${dia}/${mes}/${anio}`;
+            }
+        }
 
+        const fechaConvertida = new Date(fecha);
+        if (Number.isNaN(fechaConvertida.getTime())) {
+            return "-";
+        }
+
+        return fechaConvertida.toLocaleDateString("es-AR");
     };
 
 
@@ -635,6 +721,31 @@ export default function CajaPage() {
 
         }
 
+    };
+
+
+    // ========================================
+    // CERRAR CAJA
+    // ========================================
+
+    const cerrarCaja = async () => {
+        if (!caja?._id || !estaAbierta) return;
+        const confirmar = window.confirm(
+            "¿Querés cerrar la caja de hoy? Después de cerrarla, no se podrán agregar ni modificar movimientos normales."
+        );
+        if (!confirmar) return;
+
+        try {
+            setCargando(true);
+            setError(null);
+            const respuesta = await api.post(`/caja/${caja._id}/cerrar`);
+            setCaja(respuesta.data.caja || { ...caja, estado: "CERRADA" });
+        } catch (error) {
+            console.error("Error cerrando caja:", error);
+            setError(error.response?.data?.mensaje || "No se pudo cerrar la caja.");
+        } finally {
+            setCargando(false);
+        }
     };
 
 
@@ -977,7 +1088,7 @@ export default function CajaPage() {
     // ========================================
 
     const estaAbierta =
-        caja.estado === "ABIERTA";
+        caja.estado === "ABIERTA" && !modoConsulta;
 
 
     const cheques =
@@ -1355,7 +1466,10 @@ export default function CajaPage() {
                             fontWeight="700"
                             color="gray.800"
                         >
-                            Caja
+                            {modoConsulta && caja
+                                ? `Caja Cerrada — ${formatearFecha(caja.fecha)}`
+                                : "Caja"
+                            }
                         </Text>
 
                         <Text
@@ -1368,6 +1482,28 @@ export default function CajaPage() {
 
                     </Box>
 
+
+                    <Flex align="center" gap={3}>
+
+                    {estaAbierta && !modoConsulta && (
+                        <Button
+                            colorScheme="red"
+                            variant="solid"
+                            onClick={cerrarCaja}
+                        >
+                            Cerrar caja
+                        </Button>
+                    )}
+
+                    {modoConsulta && onVolver && (
+                        <Button
+                            leftIcon={<Icon as={FiArrowLeft} />}
+                            variant="outline"
+                            onClick={onVolver}
+                        >
+                            Volver a cajas anteriores
+                        </Button>
+                    )}
 
                     <Badge
                         colorScheme={
@@ -1387,6 +1523,7 @@ export default function CajaPage() {
                         }
 
                     </Badge>
+                    </Flex>
 
                 </Flex>
 
@@ -1745,16 +1882,60 @@ export default function CajaPage() {
 
                                         <Box flex={1.2}>
 
-                                            <Text
-                                                fontSize="sm"
-                                                color="gray.600"
-                                            >
-                                                {
-                                                    formatearFecha(
-                                                        ingreso.contable
-                                                    )
-                                                }
-                                            </Text>
+                                            {contableEditandoId === ingreso._id ? (
+                                                <Flex direction="row" alignItems={"center"} gap={2}>
+                                                    <Input
+                                                        type="date"
+                                                        size="sm"
+                                                        maxW={"130px"}
+                                                        value={contableFecha}
+                                                        onChange={(e) => setContableFecha(e.target.value)}
+                                                        isDisabled={guardandoContableId === ingreso._id}
+                                                        aria-label={`Fecha contable de ${ingreso.cliente}`}
+                                                    />
+                                                    <Flex gap={1}>
+                                                        <Button
+                                                            size="xs"
+                                                            colorScheme="green"
+                                                            onClick={() => guardarFechaContable(ingreso)}
+                                                            isLoading={guardandoContableId === ingreso._id}
+                                                            loadingText="Guardando"
+                                                        >
+                                                            <Icon as={FiCheck} />
+                                                        </Button>
+                                                        <Button
+                                                            size="xs"
+                                                            variant="ghost"
+                                                            onClick={cancelarEdicionContable}
+                                                            isDisabled={guardandoContableId === ingreso._id}
+                                                            aria-label="Cancelar edición de fecha contable"
+                                                        >
+                                                            <Icon as={FiX} />
+                                                        </Button>
+                                                    </Flex>
+                                                    {errorContable && contableEditandoId === ingreso._id && (
+                                                        <Text fontSize="xs" color="red.500">
+                                                            {errorContable}
+                                                        </Text>
+                                                    )}
+                                                </Flex>
+                                            ) : (
+                                                <Flex align="center" gap={2}>
+                                                    <Text fontSize="sm" color="gray.600">
+                                                        {formatearFecha(ingreso.contable)}
+                                                    </Text>
+                                                    <Button
+                                                        size="xs"
+                                                        variant="ghost"
+                                                        colorScheme="blue"
+                                                        onClick={() => iniciarEdicionContable(ingreso)}
+                                                        title="Editar fecha contable"
+                                                        aria-label={`Editar fecha contable de ${ingreso.cliente}`}
+                                                    >
+                                                        <Icon as={FiEdit} />
+                                                    </Button>
+                                                </Flex>
+                                            )}
 
                                         </Box>
 
