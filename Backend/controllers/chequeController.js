@@ -3,6 +3,36 @@ const Caja = require("../models/Caja");
 const MovimientoCheque = require("../models/MovimientoCheque");
 const MovimientoCaja = require("../models/MovimientoCaja");
 
+
+function validarTipoYCuenta(tipoRecibido, cuentaRecibida) {
+  const tipo = tipoRecibido || "CHEQUE";
+
+  if (!["CHEQUE", "ECHEQ"].includes(tipo)) {
+    return {
+      error: "El tipo de cheque no es válido.",
+    };
+  }
+
+  if (tipo === "ECHEQ") {
+    return {
+      tipo: "ECHEQ",
+      cuenta: null,
+    };
+  }
+
+  if (!["B", "V"].includes(cuentaRecibida)) {
+    return {
+      error: "Los cheques físicos deben tener cuenta B o V.",
+    };
+  }
+
+  return {
+    tipo: "CHEQUE",
+    cuenta: cuentaRecibida,
+  };
+}
+
+
 // ========================================
 // CREAR CHEQUE
 // ========================================
@@ -16,6 +46,8 @@ async function crearCheque(
     const {
       cajaId,
       numero,
+      tipo,
+      cuenta,
       banco,
       librador,
       importe,
@@ -58,6 +90,16 @@ async function crearCheque(
       });
     }
 
+    
+    const clasificacion = validarTipoYCuenta(tipo, cuenta);
+
+    if (clasificacion.error) {
+      return res.status(400).json({
+        mensaje: clasificacion.error,
+      });
+    }
+
+
     const importeNumero =
       Number(importe);
 
@@ -76,11 +118,11 @@ async function crearCheque(
     const cheque =
       await Cheque.create({
         numero,
+        tipo: clasificacion.tipo,
         banco,
         librador,
-        importe:
-          importeNumero,
-
+        importe: importeNumero,
+        cuenta: clasificacion.cuenta,
         fechaEmision,
         fechaVencimiento,
 
@@ -138,10 +180,11 @@ async function crearCheque(
 
       datos: {
         numero,
+        tipo,
         banco,
         librador,
-        importe:
-          importeNumero,
+        importe: importeNumero,
+        cuenta,
       },
     });
 
@@ -288,9 +331,11 @@ async function editarCheque(
 
     const camposPermitidos = [
       "numero",
+      "tipo",
       "banco",
       "librador",
       "importe",
+      "cuenta",
       "fechaEmision",
       "fechaVencimiento",
       "observaciones",
@@ -334,6 +379,25 @@ async function editarCheque(
         });
       }
     }
+
+    const tipoFinal = req.body.tipo ?? cheque.tipo ?? "CHEQUE";
+    const cuentaFinal = req.body.cuenta !== undefined
+      ? req.body.cuenta
+      : cheque.cuenta;
+
+    const clasificacion = validarTipoYCuenta(
+      tipoFinal,
+      cuentaFinal
+    );
+
+    if (clasificacion.error) {
+      return res.status(400).json({
+        mensaje: clasificacion.error,
+      });
+    }
+
+    cambios.tipo = clasificacion.tipo;
+    cambios.cuenta = clasificacion.cuenta;
 
     Object.assign(
       cheque,
@@ -489,23 +553,14 @@ async function depositarCheque(
         `Cheque depositado #${cheque.numero}`,
 
       datos: {
-        numero:
-          cheque.numero,
-
-        banco:
-          cheque.banco,
-
-        librador:
-          cheque.librador,
-
-        importe:
-          cheque.importe,
-
-        fechaVencimiento:
-          cheque.fechaVencimiento,
-
-        fechaDeposito:
-          cheque.fechaDeposito,
+        numero: cheque.numero,
+        tipo: cheque.tipo,
+        banco: cheque.banco,
+        librador: cheque.librador,
+        importe: cheque.importe,
+        cuenta: cheque.cuenta,
+        fechaVencimiento: cheque.fechaVencimiento,
+        fechaDeposito: cheque.fechaDeposito,
       },
     });
 
@@ -656,26 +711,15 @@ async function entregarCheque(
         `Cheque entregado #${cheque.numero}`,
 
       datos: {
-        numero:
-          cheque.numero,
-
-        banco:
-          cheque.banco,
-
-        librador:
-          cheque.librador,
-
-        importe:
-          cheque.importe,
-
-        fechaVencimiento:
-          cheque.fechaVencimiento,
-
-        fechaEntrega:
-          cheque.fechaEntrega,
-
-        entregadoA:
-          entregadoA,
+        numero: cheque.numero,
+        tipo: cheque.tipo,
+        banco: cheque.banco,
+        librador: cheque.librador,
+        importe: cheque.importe,
+        cuenta: cheque.cuenta,
+        fechaVencimiento: cheque.fechaVencimiento,
+        fechaEntrega: cheque.fechaEntrega,
+        entregadoA: entregadoA,
       },
     });
 

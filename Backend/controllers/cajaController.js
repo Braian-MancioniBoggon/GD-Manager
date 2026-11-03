@@ -173,6 +173,36 @@ async function cerrarCajaInterna(caja, usuarioId) {
   return caja;
 }
 
+
+function validarTipoYCuenta(tipoRecibido, cuentaRecibida) {
+  const tipo = tipoRecibido || "CHEQUE";
+
+  if (!["CHEQUE", "ECHEQ"].includes(tipo)) {
+    return {
+      error: "El tipo de cheque no es válido.",
+    };
+  }
+
+  if (tipo === "ECHEQ") {
+    return {
+      tipo: "ECHEQ",
+      cuenta: null,
+    };
+  }
+
+  if (!["B", "V"].includes(cuentaRecibida)) {
+    return {
+      error: "Los cheques físicos deben tener cuenta B o V.",
+    };
+  }
+
+  return {
+    tipo: "CHEQUE",
+    cuenta: cuentaRecibida,
+  };
+}
+
+
 // ========================================
 // OBTENER CAJA DEL DÍA
 // ========================================
@@ -1940,6 +1970,8 @@ async function agregarCheque(
 
     const {
       numero,
+      tipo,
+      cuenta,
       banco,
       librador,
       importe,
@@ -1979,38 +2011,31 @@ async function agregarCheque(
       });
     }
 
+    const clasificacion = validarTipoYCuenta(tipo, cuenta);
+      
+    if (clasificacion.error) {
+      return res.status(400).json({
+        mensaje: clasificacion.error,
+      });
+    }
+
     // ========================================
     // CREAR CHEQUE
     // ========================================
 
     const cheque =
       await Cheque.create({
-        numero:
-          String(numero).trim(),
-
-        banco:
-          String(banco).trim(),
-
-        librador:
-          String(librador).trim(),
-
-        importe:
-          importeNumero,
-
-        fechaEmision:
-          new Date(fechaEmision),
-
-        fechaVencimiento:
-          new Date(fechaVencimiento),
-
-        estado:
-          "PENDIENTE",
-
-        observaciones:
-          observaciones || "",
-
-        creadoPor:
-          req.usuario._id,
+        numero: String(numero).trim(),
+        tipo: clasificacion.tipo,
+        banco: String(banco).trim(),
+        librador: String(librador).trim(),
+        cuenta: clasificacion.cuenta,
+        importe: importeNumero,
+        fechaEmision: new Date(fechaEmision),
+        fechaVencimiento: new Date(fechaVencimiento),
+        estado: "PENDIENTE",
+        observaciones: observaciones || "",
+        creadoPor: req.usuario._id,
       });
 
     // ========================================
@@ -2045,23 +2070,14 @@ async function agregarCheque(
         "Nuevo cheque agregado a la caja",
 
       datos: {
-        numero:
-          cheque.numero,
-
-        banco:
-          cheque.banco,
-
-        librador:
-          cheque.librador,
-
-        importe:
-          cheque.importe,
-
-        fechaEmision:
-          cheque.fechaEmision,
-
-        fechaVencimiento:
-          cheque.fechaVencimiento,
+        numero: cheque.numero,
+        tipo: cheque.tipo,
+        banco: cheque.banco,
+        librador: cheque.librador,
+        importe: cheque.importe,
+        cuenta: cheque.cuenta,
+        fechaEmision: cheque.fechaEmision,
+        fechaVencimiento: cheque.fechaVencimiento,
       },
     });
 
@@ -2178,6 +2194,8 @@ async function actualizarCheque(
 
     const {
       numero,
+      tipo,
+      cuenta,
       banco,
       librador,
       importe,
@@ -2214,48 +2232,26 @@ async function actualizarCheque(
     }
 
     const datosAnteriores = {
-      numero:
-        cheque.numero,
-
-      banco:
-        cheque.banco,
-
-      librador:
-        cheque.librador,
-
-      importe:
-        cheque.importe,
-
-      fechaEmision:
-        cheque.fechaEmision,
-
-      fechaVencimiento:
-        cheque.fechaVencimiento,
-
-      observaciones:
-        cheque.observaciones,
+      numero: cheque.numero,
+      tipo: cheque.tipo,
+      banco: cheque.banco,
+      librador: cheque.librador,
+      importe: cheque.importe,
+      cuenta: cheque.cuenta,
+      fechaEmision: cheque.fechaEmision,
+      fechaVencimiento: cheque.fechaVencimiento,
+      observaciones: cheque.observaciones,
     };
 
-    cheque.numero =
-      String(numero).trim();
-
-    cheque.banco =
-      String(banco).trim();
-
-    cheque.librador =
-      String(librador).trim();
-
-    cheque.importe =
-      importeNumero;
-
-    cheque.fechaEmision =
-      new Date(fechaEmision);
-
-    cheque.fechaVencimiento =
-      new Date(fechaVencimiento);
-
-    cheque.observaciones =
-      observaciones || "";
+    cheque.numero = String(numero).trim();
+    cheque.tipo = clasificacion.tipo;
+    cheque.banco = String(banco).trim();
+    cheque.librador = String(librador).trim();
+    cheque.importe = importeNumero;
+    cheque.cuenta = clasificacion.cuenta;
+    cheque.fechaEmision = new Date(fechaEmision);
+    cheque.fechaVencimiento = new Date(fechaVencimiento);
+    cheque.observaciones = observaciones || "";
 
     await cheque.save();
 
@@ -2280,26 +2276,15 @@ async function actualizarCheque(
           datosAnteriores,
 
         nuevo: {
-          numero:
-            cheque.numero,
-
-          banco:
-            cheque.banco,
-
-          librador:
-            cheque.librador,
-
-          importe:
-            cheque.importe,
-
-          fechaEmision:
-            cheque.fechaEmision,
-
-          fechaVencimiento:
-            cheque.fechaVencimiento,
-
-          observaciones:
-            cheque.observaciones,
+          numero: cheque.numero,
+          tipo: cheque.tipo,
+          banco: cheque.banco,
+          librador: cheque.librador,
+          importe: cheque.importe,
+          cuenta: cheque.cuenta,
+          fechaEmision: cheque.fechaEmision,
+          fechaVencimiento: cheque.fechaVencimiento,
+          observaciones: cheque.observaciones,
         },
       },
     });
